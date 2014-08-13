@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<project name="cs162-proj3" default="usage" basedir=".">
+  <description>CS162 Project 3</description>
+
+  <property name="dir.build" value="build" />
+  <property name="dir.src" value="src" />
+  <property name="dir.lib" value="lib" />
+
+  <path id="classpath.all"><fileset dir="${dir.lib}"><include name="*.jar"/></fileset></path>
+  <path id="classpath.cp"><pathelement location="${dir.build}" /></path>
+
+  <!-- Compile the whole project -->
+  <target name="compile" description="Compile the project">
+    <mkdir dir="${dir.build}" />
+    <javac destdir="${dir.build}"
+           debug="true"
+           encoding="UTF-8"
+           fork="true"
+           classpathref="classpath.cp"
+           includeantruntime="false"
+           debuglevel="lines,vars,source">
+      <src path="${dir.src}" />
+      <src path="${dir.src}/main" />
+      <src path="${dir.src}/test" />
+      <src path="${dir.src}/unit" />
+      <compilerarg value="-Xlint:all,-fallthrough" />
+      <classpath refid="classpath.all" />
+    </javac>
+  </target>
+
+    <!-- Run a single integration test -->
+  <target name="test.single" depends="compile">
+    <junit fork="true" haltonfailure="true">
+      <jvmarg value="-Xdebug"/>
+      <classpath refid="classpath.all"/>
+
+      <classpath>
+        <pathelement path="${dir.build}"/>
+        <pathelement path="${dir.lib}/*.jar"/>
+      </classpath>
+
+      <formatter type="brief" usefile="false"/>
+      <test name="${test}" haltonfailure="no"/>
+    </junit>
+  </target>
+
+  <!-- Run Junit tests -->
+  <target name="unit" depends="compile" description="Run unit tests">
+
+    <junit printsummary="yes" haltonerror="no" haltonfailure="no">
+      <sysproperty key="basedir" value="${dir.build}"/>
+      <classpath>
+        <pathelement location="${dir.build}"/>
+        <pathelement path="${dir.lib}/*.jar"/>
+      </classpath>
+      <classpath refid="classpath.all"/>
+      <formatter type="brief" usefile="false" />
+      <batchtest todir="">
+        <fileset dir="${dir.build}">
+          <include name="edu/berkeley/cs162/*UnitTests.class"/>
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+
+  <!-- Run a single unit test -->
+  <target name="unit.single" depends="compile">
+    <junit fork="true" haltonfailure="true">
+      <jvmarg value="-Xdebug"/>
+      <classpath refid="classpath.all"/>
+
+      <classpath>
+        <pathelement path="${dir.build}"/>
+        <pathelement path="${dir.lib}/*.jar"/>
+      </classpath>
+
+      <formatter type="brief" usefile="false"/>
+      <test name="${test}" haltonfailure="no"/>
+    </junit>
+  </target>
+
+  <!-- Clean build directory -->
+  <target name="clean" description="Delete .class files">
+    <delete dir="${dir.build}" />
+  </target>
+
+  <target name="test" depends="compile" description="Run the integration tests">
+
+    <junit printsummary="yes" haltonerror="no" haltonfailure="no">
+      <sysproperty key="basedir" value="${dir.build}"/>
+      <classpath>
+        <pathelement location="${dir.build}"/>
+        <pathelement path="${dir.lib}/*.jar"/>
+      </classpath>
+      <classpath refid="classpath.all"/>
+      <formatter type="brief" usefile="false" />
+      <batchtest todir="">
+        <fileset dir="${dir.build}">
+          <include name="edu/berkeley/cs162/*IntTests.class"/>
+        </fileset>
+      </batchtest>
+    </junit>
+
+  </target>
+
+  <target name="usage">
+<echo>
+---------------------------------------------------------
+
+- Compile the Java files ...................... compile
+
+- Clean the source tree ....................... clean
+
+- Run the unit tests .......................... unit
+
+- Run the integration tests ................... test
+
+---------------------------------------------------------
+</echo>
+  </target>
+</project>
